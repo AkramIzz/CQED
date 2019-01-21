@@ -8,6 +8,7 @@
 // Our bytecode instructions
 typedef enum {
 	OP_CONSTANT,
+	OP_NEGATE,
 	OP_RETURN,
 } OpCode;
 

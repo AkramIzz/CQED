@@ -13,6 +13,7 @@ int main(int argc, const char* argv[]) {
 	int constant_index = add_constant(&chunk, 1);
 	write_chunk(&chunk, OP_CONSTANT, 122);
 	write_chunk(&chunk, constant_index, 122);
+	write_chunk(&chunk, OP_NEGATE, 122);
 	write_chunk(&chunk, OP_RETURN, 122);
 	
 	disassemble_chunk(&chunk, "test");
