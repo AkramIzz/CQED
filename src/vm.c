@@ -5,14 +5,29 @@
 #include "vm.h"
 #include "value.h"
 
+static void reset_stack(VM *vm);
 static InterpretResult run(VM *vm);
 
 void init_vm(VM *vm) {
+      reset_stack(vm);
+}
 
+static void reset_stack(VM *vm) {
+      vm->stack_top = vm->stack;
 }
 
 void free_vm(VM *vm) {
 
+}
+
+void push(VM *vm, Value value) {
+      *vm->stack_top = value;
+      ++vm->stack_top;
+}
+
+Value pop(VM *vm) {
+      --vm->stack_top;
+      return *vm->stack_top;
 }
 
 InterpretResult interpret(VM *vm, Chunk *chunk) {
@@ -28,6 +43,13 @@ static InterpretResult run(VM *vm) {
    for (;;) {
 
 #ifdef DEBUG_TRACE_EXECUTION
+      printf("         ");
+      for (Value *slot = vm->stack; slot < vm->stack_top; ++slot) {
+            printf("[ ");
+            print_value(*slot);
+            printf(" ]");
+      }
+      printf("\n");
       disassemble_instruction(vm->chunk, (int)(vm->ip - vm->chunk->code));
 #endif
 
@@ -35,13 +57,14 @@ static InterpretResult run(VM *vm) {
       switch(instruction = READ_BYTE()) {
          case OP_CONSTANT: {
             Value constant = READ_CONSTANT();
-            print_value(constant);
+            push(vm, constant);
             printf("\n");
             break;
          }
          case OP_RETURN: {
+            print_value(pop(vm));
+            printf("\n");
             return INTERPRET_OK;
-            break;
          }
       }
    }

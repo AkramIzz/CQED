@@ -2,11 +2,16 @@
 #define QED_VM_H
 
 #include "chunk.h"
+#include "value.h"
+
+#define STACK_MAX 256
 
 typedef struct {
    Chunk *chunk;
    // instruction pointer
    uint8_t *ip;
+   Value stack[STACK_MAX];
+   Value *stack_top;
 } VM;
 
 typedef enum {
@@ -17,6 +22,8 @@ typedef enum {
 
 void init_vm(VM *vm);
 void free_vm(VM *vm);
+void push(VM *vm, Value value);
+Value pop(VM *vm);
 InterpretResult interpret(VM *vm, Chunk *chunk);
 
 #endif
