@@ -10,9 +10,21 @@ int main(int argc, const char* argv[]) {
 	Chunk chunk;
 	init_chunk(&chunk);
 	
-	int constant_index = add_constant(&chunk, 1);
-	write_chunk(&chunk, OP_CONSTANT, 122);
-	write_chunk(&chunk, constant_index, 122);
+	int constant_index = add_constant(&chunk, 5);
+	write_chunk(&chunk, OP_CONSTANT, 100);
+	write_chunk(&chunk, constant_index, 100);
+
+	constant_index = add_constant(&chunk, 3);
+	write_chunk(&chunk, OP_CONSTANT, 100);
+	write_chunk(&chunk, constant_index, 100);
+	
+	write_chunk(&chunk, OP_ADD, 100);
+	
+	constant_index = add_constant(&chunk, 2);
+	write_chunk(&chunk, OP_CONSTANT, 100);
+	write_chunk(&chunk, constant_index, 100);
+	
+	write_chunk(&chunk, OP_DIVIDE, 100);
 	write_chunk(&chunk, OP_NEGATE, 122);
 	write_chunk(&chunk, OP_RETURN, 122);
 	
