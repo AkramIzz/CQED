@@ -11,8 +11,9 @@ static void repl();
 static void run_file(const char *path);
 static char* read_file(const char *path);
 
+VM vm;
+
 int main(int argc, const char* argv[]) {
-	VM vm;
 	init_vm(&vm);
 
 	if (argc == 1) {
@@ -31,7 +32,7 @@ int main(int argc, const char* argv[]) {
 static void repl() {
 	for (;;) {
 		char *line = readline("> ");
-		// interpret(line);
+		interpret(&vm, line);
 		add_history(line);
 		free(line);
 	}
@@ -39,11 +40,11 @@ static void repl() {
 
 static void run_file(const char *path) {
 	char *source = read_file(path);
-	// InterpretResult result = interpret(source);
+	InterpretResult result = interpret(&vm, source);
 	free(source);
 
-	// if (result == INTERPRET_COMPILE_ERROR) exit(65);
-	// if (result == INTERPRET_RUNTIME_ERROR) exit(70);
+	if (result == INTERPRET_COMPILE_ERROR) exit(65);
+	if (result == INTERPRET_RUNTIME_ERROR) exit(70);
 }
 
 static char* read_file(const char *path) {
