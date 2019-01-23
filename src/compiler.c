@@ -6,6 +6,10 @@
 #include "scanner.h"
 #include "chunk.h"
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 typedef struct {
    // next token to consume
    // use to report errors when parsing tokens
@@ -163,6 +167,11 @@ static void consume(TokenType type, const char *message) {
 }
 
 static void end_compiler() {
+#ifdef DEBUG_PRINT_CODE
+   if (!parser.had_error) {
+      disassemble_chunk(current_chunk(), "code");
+   }
+#endif
    emit_return();
 }
 
