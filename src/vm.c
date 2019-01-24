@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "common.h"
 #include "debug.h"
@@ -8,6 +9,7 @@
 
 static void reset_stack(VM *vm);
 static InterpretResult run(VM *vm);
+static void runtime_error(VM *vm, const char *format, ...);
 
 void init_vm(VM *vm) {
       reset_stack(vm);
@@ -29,6 +31,12 @@ void push(VM *vm, Value value) {
 Value pop(VM *vm) {
       --vm->stack_top;
       return *vm->stack_top;
+}
+
+Value peek(VM *vm, int distance) {
+      // stack_top points past the last element so we need to subtract 1 to
+      // get the last element
+      return vm->stack_top[-1 - distance];
 }
 
 InterpretResult interpret(VM *vm, const char *source) {
@@ -55,6 +63,10 @@ static InterpretResult run(VM *vm) {
    
    #define BINARY_OP(op) \
       do { \
+            if (!IS_NUMBER(peek(vm, 0)) || !IS_NUMBER(peek(vm, 1))) { \
+                  runtime_error(vm, "Operands must be numbers"); \
+                  return INTERPRET_RUNTIME_ERROR; \
+            } \
             double b = AS_NUMBER(pop(vm)); \
             double a = AS_NUMBER(pop(vm)); \
             push(vm, NUMBER_VAL(a op b)); \
@@ -86,6 +98,11 @@ static InterpretResult run(VM *vm) {
          case OP_MULTIPLY: BINARY_OP(*); break;
          case OP_DIVIDE: BINARY_OP(/); break;
          case OP_NEGATE:
+            if (!IS_NUMBER(peek(vm, 0))) {
+                  runtime_error(vm, "Operand must be a number");
+                  return INTERPRET_RUNTIME_ERROR;
+            }
+
             push(vm, NUMBER_VAL(-AS_NUMBER(pop(vm))));
             break;
          case OP_RETURN: {
@@ -99,4 +116,18 @@ static InterpretResult run(VM *vm) {
    #undef READ_BYTE
    #undef READ_CONSTANT
    #undef BINARY_OP
+}
+
+static void runtime_error(VM *vm, const char *format, ...) {
+      va_list args;
+      va_start(args, format);
+      vfprintf(stderr, format, args);
+      va_end(args);
+      fputs("\n", stderr);
+
+      size_t instruction = vm->ip - vm->chunk->code;
+      fprintf(stderr, "[line %d] in script\n",
+            vm->chunk->lines[instruction]);
+
+      reset_stack(vm);
 }
