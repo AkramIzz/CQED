@@ -55,9 +55,9 @@ static InterpretResult run(VM *vm) {
    
    #define BINARY_OP(op) \
       do { \
-            double b = pop(vm); \
-            double a = pop(vm); \
-            push(vm, a op b); \
+            double b = AS_NUMBER(pop(vm)); \
+            double a = AS_NUMBER(pop(vm)); \
+            push(vm, NUMBER_VAL(a op b)); \
       } while (false)
 
    for (;;) {
@@ -85,7 +85,9 @@ static InterpretResult run(VM *vm) {
          case OP_SUBTRACT: BINARY_OP(-); break;
          case OP_MULTIPLY: BINARY_OP(*); break;
          case OP_DIVIDE: BINARY_OP(/); break;
-         case OP_NEGATE: push(vm, -pop(vm)); break;
+         case OP_NEGATE:
+            push(vm, NUMBER_VAL(-AS_NUMBER(pop(vm))));
+            break;
          case OP_RETURN: {
             print_value(pop(vm));
             printf("\n");
