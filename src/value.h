@@ -28,7 +28,7 @@ typedef struct {
 
 // type checkers
 #define IS_BOOL(value) ((value).type == VAL_BOOL)
-#define IS_NIL(value) ((value).type == VAL_NUL)
+#define IS_NIL(value) ((value).type == VAL_NIL)
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)
 
 void print_value(Value value);
