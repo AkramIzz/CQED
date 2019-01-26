@@ -9,6 +9,8 @@
 
 static void reset_stack(VM *vm);
 static InterpretResult run(VM *vm);
+static bool is_falsy(Value value);
+static bool values_equal(Value a, Value b);
 static void runtime_error(VM *vm, const char *format, ...);
 
 void init_vm(VM *vm) {
@@ -61,7 +63,7 @@ static InterpretResult run(VM *vm) {
    #define READ_BYTE() (*vm->ip++)
    #define READ_CONSTANT() (vm->chunk->constants.values[READ_BYTE()])
    
-   #define BINARY_OP(op) \
+   #define BINARY_OP(result_type, op) \
       do { \
             if (!IS_NUMBER(peek(vm, 0)) || !IS_NUMBER(peek(vm, 1))) { \
                   runtime_error(vm, "Operands must be numbers"); \
@@ -69,7 +71,7 @@ static InterpretResult run(VM *vm) {
             } \
             double b = AS_NUMBER(pop(vm)); \
             double a = AS_NUMBER(pop(vm)); \
-            push(vm, NUMBER_VAL(a op b)); \
+            push(vm, result_type(a op b)); \
       } while (false)
 
    for (;;) {
@@ -96,10 +98,20 @@ static InterpretResult run(VM *vm) {
          case OP_NIL: push(vm, NIL_VAL); break;
          case OP_TRUE: push(vm, BOOL_VAL(true)); break;
          case OP_FALSE: push(vm, BOOL_VAL(false)); break;
-         case OP_ADD: BINARY_OP(+); break;
-         case OP_SUBTRACT: BINARY_OP(-); break;
-         case OP_MULTIPLY: BINARY_OP(*); break;
-         case OP_DIVIDE: BINARY_OP(/); break;
+         case OP_EQUAL: {
+            Value b = pop(vm);
+            Value a = pop(vm);
+            push(vm, BOOL_VAL(values_equal(a, b)));
+            break;
+         }
+         case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+         case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
+         case OP_ADD: BINARY_OP(NUMBER_VAL, +); break;
+         case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
+         case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
+         case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
+         case OP_NOT:
+            push(vm, BOOL_VAL(is_falsy(pop(vm)))); break;
          case OP_NEGATE:
             if (!IS_NUMBER(peek(vm, 0))) {
                   runtime_error(vm, "Operand must be a number");
@@ -119,6 +131,24 @@ static InterpretResult run(VM *vm) {
    #undef READ_BYTE
    #undef READ_CONSTANT
    #undef BINARY_OP
+}
+
+static bool is_falsy(Value value) {
+   if (IS_BOOL(value) && AS_BOOL(value) == false) return true;
+   if (IS_NIL(value)) return true;
+   if (IS_NUMBER(value) && AS_NUMBER(value) == 0) return true;
+
+   return false;
+}
+
+static bool values_equal(Value a, Value b) {
+   if (a.type != b.type) return false;
+
+   switch(a.type) {
+      case VAL_BOOL: return AS_BOOL(a) == AS_BOOL(b);
+      case VAL_NIL: return true;
+      case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
+   }
 }
 
 static void runtime_error(VM *vm, const char *format, ...) {
