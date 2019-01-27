@@ -5,6 +5,7 @@
 #include "compiler.h"
 #include "scanner.h"
 #include "chunk.h"
+#include "object.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -40,6 +41,7 @@ static void parse_precedence(Precedence precedence);
 static void grouping();
 static void literal();
 static void number();
+static void string();
 static void unary();
 static ParseRule* get_rule(TokenType type);
 static void advance();
@@ -146,6 +148,11 @@ static void literal() {
 static void number() {
    double value = strtod(parser.previous.start, NULL);
    emit_constant(NUMBER_VAL(value));
+}
+
+static void string() {
+      emit_constant(OBJ_VAL(copy_string(parser.previous.start +1,
+            parser.previous.length - 2)));
 }
 
 static void unary() {
@@ -270,7 +277,7 @@ ParseRule rules[] = {
    { NULL,  binary, PREC_COMPARISON }, // TOKEN_LESS
    { NULL,  binary, PREC_COMPARISON }, // TOKEN_LESS_EQUAL
    { NULL,  NULL, PREC_NONE }, // TOKEN_IDENTIFIER
-   { NULL,  NULL, PREC_NONE }, // TOKEN_STRING
+   { string,  NULL, PREC_NONE }, // TOKEN_STRING
    { number,NULL, PREC_NONE }, // TOKEN_NUMBER
    { NULL,  NULL, PREC_AND },  // TOKEN_AND
    { NULL,  NULL, PREC_NONE }, // TOKEN_CLASS
