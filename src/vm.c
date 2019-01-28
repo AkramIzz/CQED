@@ -1,16 +1,20 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "common.h"
+#include "memory.h"
 #include "debug.h"
 #include "compiler.h"
 #include "vm.h"
 #include "value.h"
+#include "object.h"
 
 static void reset_stack(VM *vm);
 static InterpretResult run(VM *vm);
 static bool is_falsy(Value value);
 static bool values_equal(Value a, Value b);
+static void concatenate(VM *vm);
 static void runtime_error(VM *vm, const char *format, ...);
 
 void init_vm(VM *vm) {
@@ -106,7 +110,19 @@ static InterpretResult run(VM *vm) {
          }
          case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
          case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
-         case OP_ADD: BINARY_OP(NUMBER_VAL, +); break;
+         case OP_ADD: {
+            if (IS_STRING(peek(vm, 0)) && IS_STRING(peek(vm, 1))) {
+               concatenate(vm);
+            } else if (IS_NUMBER(peek(vm, 0)) && IS_NUMBER(peek(vm, 1))) {
+               double b = AS_NUMBER(pop(vm));
+               double a = AS_NUMBER(pop(vm));
+               push(vm, NUMBER_VAL(a + b));
+            } else {
+               runtime_error(vm, "Operands must be two numbers or two strings");
+               return INTERPRET_RUNTIME_ERROR;
+            }
+            break;
+         }
          case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
          case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
          case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
@@ -148,7 +164,27 @@ static bool values_equal(Value a, Value b) {
       case VAL_BOOL: return AS_BOOL(a) == AS_BOOL(b);
       case VAL_NIL: return true;
       case VAL_NUMBER: return AS_NUMBER(a) == AS_NUMBER(b);
+      case VAL_OBJ: {
+         ObjString *a_string = AS_STRING(a);
+         ObjString *b_string = AS_STRING(b);
+         return a_string->length == b_string->length
+            && memcmp(a_string->chars, b_string->chars, a_string->length) == 0;
+      }
    }
+}
+
+static void concatenate(VM *vm) {
+   ObjString *b = AS_STRING(pop(vm));
+   ObjString *a = AS_STRING(pop(vm));
+
+   int length = a->length + b->length;
+   char *chars = ALLOCATE(char, length + 1);
+   memcpy(chars, a->chars, a->length);
+   memcpy(chars + a->length, b->chars, b->length);
+   chars[length] = '\0';
+
+   ObjString *result = take_string(chars, length);
+   push(vm, OBJ_VAL(result));
 }
 
 static void runtime_error(VM *vm, const char *format, ...) {
