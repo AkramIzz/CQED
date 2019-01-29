@@ -7,19 +7,19 @@ typedef struct sObj Obj;
 typedef struct sObjString ObjString;
 
 typedef enum {
-	VAL_BOOL,
-	VAL_NIL,
-	VAL_NUMBER,
-	VAL_OBJ
+   VAL_BOOL,
+   VAL_NIL,
+   VAL_NUMBER,
+   VAL_OBJ
 } ValueType;
 
 typedef struct {
-	ValueType type;
-	union {
-		bool boolean;
-		double number;
-		Obj *obj;
-	} as;
+   ValueType type;
+   union {
+      bool boolean;
+      double number;
+      Obj *obj;
+   } as;
 } Value;
 
 // constructors
@@ -42,9 +42,9 @@ typedef struct {
 void print_value(Value value);
 
 typedef struct {
-	int capacity;
-	int count;
-	Value *values;
+   int capacity;
+   int count;
+   Value *values;
 } ValueArray;
 
 void init_value_array(ValueArray *array);

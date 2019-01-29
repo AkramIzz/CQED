@@ -2,16 +2,16 @@
 #define QED_MEMORY_H
 
 #define ALLOCATE(type, count) \
-	(type*)reallocate(NULL, 0, sizeof(type) * (count))
+   (type*)reallocate(NULL, 0, sizeof(type) * (count))
 
 #define GROW_CAPACITY(capacity) \
-	((capacity) < 8 ? 8 : (capacity) * 2)
+   ((capacity) < 8 ? 8 : (capacity) * 2)
 
 #define GROW_ARRAY(array, type, old_count, new_count) \
-	(type*)reallocate((array), sizeof(type) * (old_count), sizeof(type) * (new_count))
+   (type*)reallocate((array), sizeof(type) * (old_count), sizeof(type) * (new_count))
 
 #define FREE_ARRAY(array, type, count) \
-	reallocate((array), sizeof(type) * (count), 0)
+   reallocate((array), sizeof(type) * (count), 0)
 
 // This one function handles memory allocating, deallocating and reallocating
 // We need all memory allocations in the interpreter to pass through it in order to be able

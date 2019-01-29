@@ -7,30 +7,30 @@
 // Operation codes
 // Our bytecode instructions
 typedef enum {
-	OP_CONSTANT,
-	OP_NIL,
-	OP_TRUE,
-	OP_FALSE,
-	OP_EQUAL,
-	OP_GREATER,
-	OP_LESS,
-	OP_ADD,
-	OP_SUBTRACT,
-	OP_MULTIPLY,
-	OP_DIVIDE,
-	OP_NOT,
-	OP_NEGATE,
-	OP_RETURN,
+   OP_CONSTANT,
+   OP_NIL,
+   OP_TRUE,
+   OP_FALSE,
+   OP_EQUAL,
+   OP_GREATER,
+   OP_LESS,
+   OP_ADD,
+   OP_SUBTRACT,
+   OP_MULTIPLY,
+   OP_DIVIDE,
+   OP_NOT,
+   OP_NEGATE,
+   OP_RETURN,
 } OpCode;
 
 // An array of instructions
 // This is where instructions for a program are stored
 typedef struct {
-	int count;
-	int capacity;
-	uint8_t *code;
-	ValueArray constants;
-	int *lines;
+   int count;
+   int capacity;
+   uint8_t *code;
+   ValueArray constants;
+   int *lines;
 } Chunk;
 
 void init_chunk(Chunk *chunk);

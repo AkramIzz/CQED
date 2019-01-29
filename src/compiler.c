@@ -90,16 +90,16 @@ static void parse_precedence(Precedence precedence) {
    advance();
    ParseFn prefix_rule = get_rule(parser.previous.type)->prefix;
    if (prefix_rule == NULL) {
-      error_at_previous("Expected expression");
-      return;
+   error_at_previous("Expected expression");
+   return;
    }
 
    prefix_rule();
 
    while (precedence <= get_rule(parser.current.type)->precedence) {
-      advance();
-      ParseFn infix_rule = get_rule(parser.previous.type)->infix;
-      infix_rule();
+   advance();
+   ParseFn infix_rule = get_rule(parser.previous.type)->infix;
+   infix_rule();
    }
 }
 
@@ -111,22 +111,22 @@ static void binary() {
    parse_precedence((Precedence) (rule->precedence + 1));
 
    switch(operator_type) {
-      case TOKEN_EQUAL_EQUAL: emit_byte(OP_EQUAL); break;
-      // a != b is equal to !(a == b)
-      case TOKEN_BANG_EQUAL: emit_bytes(OP_EQUAL, OP_NOT); break;
-      case TOKEN_GREATER: emit_byte(OP_GREATER); break;
-      // a >= b is equal to !(a < b)
-      case TOKEN_GREATER_EQUAL: emit_bytes(OP_LESS, OP_NOT); break;
-      case TOKEN_LESS: emit_byte(OP_LESS); break;
-      // a <= b is equal to !(a > b)
-      case TOKEN_LESS_EQUAL: emit_bytes(OP_GREATER, OP_NOT); break;
-      case TOKEN_PLUS: emit_byte(OP_ADD); break;
-      case TOKEN_MINUS: emit_byte(OP_SUBTRACT); break;
-      case TOKEN_STAR: emit_byte(OP_MULTIPLY); break;
-      case TOKEN_SLASH: emit_byte(OP_DIVIDE); break;
-      default:
-         // Unreachable
-         return;
+   case TOKEN_EQUAL_EQUAL: emit_byte(OP_EQUAL); break;
+   // a != b is equal to !(a == b)
+   case TOKEN_BANG_EQUAL: emit_bytes(OP_EQUAL, OP_NOT); break;
+   case TOKEN_GREATER: emit_byte(OP_GREATER); break;
+   // a >= b is equal to !(a < b)
+   case TOKEN_GREATER_EQUAL: emit_bytes(OP_LESS, OP_NOT); break;
+   case TOKEN_LESS: emit_byte(OP_LESS); break;
+   // a <= b is equal to !(a > b)
+   case TOKEN_LESS_EQUAL: emit_bytes(OP_GREATER, OP_NOT); break;
+   case TOKEN_PLUS: emit_byte(OP_ADD); break;
+   case TOKEN_MINUS: emit_byte(OP_SUBTRACT); break;
+   case TOKEN_STAR: emit_byte(OP_MULTIPLY); break;
+   case TOKEN_SLASH: emit_byte(OP_DIVIDE); break;
+   default:
+      // Unreachable
+      return;
    }
 }
 
@@ -136,13 +136,13 @@ static void grouping() {
 }
 
 static void literal() {
-      switch(parser.previous.type) {
-            case TOKEN_FALSE: emit_byte(OP_FALSE); break;
-            case TOKEN_NIL: emit_byte(OP_NIL); break;
-            case TOKEN_TRUE: emit_byte(OP_TRUE); break;
-            default:
-                  return; // Unreachable
-      }
+   switch(parser.previous.type) {
+      case TOKEN_FALSE: emit_byte(OP_FALSE); break;
+      case TOKEN_NIL: emit_byte(OP_NIL); break;
+      case TOKEN_TRUE: emit_byte(OP_TRUE); break;
+      default:
+         return; // Unreachable
+   }
 }
 
 static void number() {
@@ -151,8 +151,8 @@ static void number() {
 }
 
 static void string() {
-      emit_constant(OBJ_VAL(copy_string(parser.previous.start +1,
-            parser.previous.length - 2)));
+   emit_constant(OBJ_VAL(copy_string(parser.previous.start +1,
+      parser.previous.length - 2)));
 }
 
 static void unary() {
@@ -162,11 +162,11 @@ static void unary() {
    parse_precedence(PREC_UNARY);
 
    switch(operator_type) {
-      case TOKEN_BANG: emit_byte(OP_NOT); break;
-      case TOKEN_MINUS: emit_byte(OP_NEGATE); break;
-      default:
-         // Unreachable
-         return;
+   case TOKEN_BANG: emit_byte(OP_NOT); break;
+   case TOKEN_MINUS: emit_byte(OP_NEGATE); break;
+   default:
+      // Unreachable
+      return;
    }
 }
 
@@ -178,17 +178,17 @@ static void advance() {
    parser.previous = parser.current;
 
    for (;;) {
-      parser.current = scan_token();
-      if (parser.current.type != TOKEN_ERROR) break;
-      // Error messages from scanner are stored in error tokens
-      error_at_current(parser.current.start);
+   parser.current = scan_token();
+   if (parser.current.type != TOKEN_ERROR) break;
+   // Error messages from scanner are stored in error tokens
+   error_at_current(parser.current.start);
    }
 }
 
 static void consume(TokenType type, const char *message) {
    if (parser.current.type == type) {
-      advance();
-      return;
+   advance();
+   return;
    }
 
    error_at_current(message);
@@ -197,7 +197,7 @@ static void consume(TokenType type, const char *message) {
 static void end_compiler() {
 #ifdef DEBUG_PRINT_CODE
    if (!parser.had_error) {
-      disassemble_chunk(current_chunk(), "code");
+   disassemble_chunk(current_chunk(), "code");
    }
 #endif
    emit_return();
@@ -219,8 +219,8 @@ static void emit_constant(Value value) {
 static uint8_t make_constant(Value value) {
    int constant_index = add_constant(current_chunk(), value);
    if (constant_index > UINT8_MAX) {
-      error_at_previous("Too many constants in one chunk");
-      return 0;
+   error_at_previous("Too many constants in one chunk");
+   return 0;
    }
 
    return (uint8_t) constant_index;
@@ -245,11 +245,11 @@ static void error_at(Token *error_token, const char *message) {
    fprintf(stderr, "[line %d] Error", error_token->line);
 
    if (error_token->type == TOKEN_EOF) {
-      fprintf(stderr, " at end");
+   fprintf(stderr, " at end");
    } else if (error_token->type == TOKEN_ERROR) {
-      // Nothing
+   // Nothing
    } else {
-      fprintf(stderr, " at '%.*s'", error_token->length, error_token->start);
+   fprintf(stderr, " at '%.*s'", error_token->length, error_token->start);
    }
 
    fprintf(stderr, ": %s\n", message);

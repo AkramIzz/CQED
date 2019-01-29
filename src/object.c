@@ -16,7 +16,7 @@ static Obj* allocate_object(size_t size, ObjType type) {
 }
 
 ObjString* take_string(char *chars, int length) {
-      return allocate_string(chars, length);
+   return allocate_string(chars, length);
 }
 
 ObjString* copy_string(const char *chars, int length) {
@@ -36,8 +36,8 @@ static ObjString* allocate_string(char *chars, int length) {
 
 void print_obj(Value value) {
    switch(OBJ_TYPE(value)) {
-      case OBJ_STRING:
-         printf("%s", AS_CSTRING(value));
-         break;
+   case OBJ_STRING:
+      printf("%s", AS_CSTRING(value));
+      break;
    }
 }
