@@ -1,8 +1,13 @@
 #ifndef QED_MEMORY_H
 #define QED_MEMORY_H
 
+#include "object.h"
+
 #define ALLOCATE(type, count) \
    (type*)reallocate(NULL, 0, sizeof(type) * (count))
+
+#define FREE(type, memory) \
+   reallocate((memory), sizeof(type), 0)
 
 #define GROW_CAPACITY(capacity) \
    ((capacity) < 8 ? 8 : (capacity) * 2)
@@ -21,5 +26,7 @@
 // Given non-zero [old_size] and [new_size] it resizes the memory pointed to by [previous]
 //   and return a pointer pointing to the resized memory (may differ from [previous]) 
 void* reallocate(void *previous, size_t old_size, size_t new_size);
+// frees a linked list of objects
+void free_objects(Obj *objects);
 
 #endif

@@ -60,13 +60,19 @@ ParseRule rules[];
 
 Parser parser;
 
+VM *compiling_vm;
+static VM *current_vm() {
+   return compiling_vm;
+}
+
 Chunk *compiling_chunk;
 static Chunk *current_chunk() {
    return compiling_chunk;
 }
 
-bool compile(const char *source, Chunk *chunk) {
+bool compile(const char *source, VM *vm, Chunk *chunk) {
    init_scanner(source);
+   compiling_vm = vm;
    compiling_chunk = chunk;
 
    parser.had_error = false;
@@ -151,7 +157,7 @@ static void number() {
 }
 
 static void string() {
-   emit_constant(OBJ_VAL(copy_string(parser.previous.start +1,
+   emit_constant(OBJ_VAL(copy_string(current_vm(), parser.previous.start +1,
       parser.previous.length - 2)));
 }
 

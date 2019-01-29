@@ -2,6 +2,7 @@
 #define QED_OBJECT_H
 
 #include "common.h"
+#include "vm.h"
 #include "value.h"
 
 typedef enum {
@@ -10,6 +11,7 @@ typedef enum {
 
 struct sObj {
    ObjType type;
+   struct sObj *next;
 };
 
 struct sObjString {
@@ -32,8 +34,8 @@ static inline bool is_obj_type(Value value, ObjType type) {
    return IS_OBJ(value) && AS_OBJ(value)->type == type;
 }
 
-ObjString* take_string(char *chars, int length);
-ObjString* copy_string(const char *chars, int length);
+ObjString* take_string(VM *vm, char *chars, int length);
+ObjString* copy_string(VM *vm, const char *chars, int length);
 void print_obj(Value value);
 
 #endif
