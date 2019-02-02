@@ -3,6 +3,7 @@
 
 #include "object.h"
 #include "memory.h"
+#include "table.h"
 
 static ObjString* allocate_string(VM *vm, char *chars, int length, uint32_t hash);
 static uint32_t hash_string(const char *key, int length);
@@ -21,11 +22,21 @@ static Obj* allocate_object(VM *vm, size_t size, ObjType type) {
 
 ObjString* take_string(VM *vm, char *chars, int length) {
    uint32_t hash = hash_string(chars, length);
+   ObjString *interned = table_find_string(&vm->strings, chars, length, hash);
+   if (interned != NULL) {
+      // we don't need a new string, it already exists in our strings collection
+      // and since we own the string we can safely free it
+      FREE_ARRAY(chars, char, length + 1);
+      return interned;
+   }
+
    return allocate_string(vm, chars, length, hash);
 }
 
 ObjString* copy_string(VM *vm, const char *chars, int length) {
    uint32_t hash = hash_string(chars, length);
+   ObjString *interned = table_find_string(&vm->strings, chars, length, hash);
+   if (interned != NULL) return interned;
 
    char *heap_chars = ALLOCATE(char, length + 1);
    memcpy(heap_chars, chars, length);
@@ -39,6 +50,10 @@ static ObjString* allocate_string(VM *vm, char *chars, int length, uint32_t hash
    string->length = length;
    string->chars = chars;
    string->hash = hash;
+
+   // we only care about the keys, so we set the values to nil
+   // more like a hash set than a hash table
+   table_set(&vm->strings, string, NIL_VAL);
 
    return string;
 }

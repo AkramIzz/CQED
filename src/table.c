@@ -103,11 +103,38 @@ static Entry* find_entry(Entry *entries, int capacity, ObjString *key) {
             // a tombstone. Continue searching but remember the tombstone
             tombstone = entry;
          }
+      // we can't compare hashes because of hash collisions
+      // so we make use of string interning that we support
+      // in short, if the two keys have the same values, they are 
+      // guarenteed to point to the same location in memory
       } else if (entry->key == key) {
          // entry found.
          return entry;
       }
 
       index = (index + 1) % capacity;
+   }
+}
+
+ObjString* table_find_string(Table *table, const char *chars, int length, uint32_t hash) {
+   if (table->entries == NULL) return NULL;
+
+   uint32_t index = hash % table->capacity;
+   for (;;) {
+      Entry *entry = &table->entries[index];
+
+      if (entry->key == NULL) {
+         // empty entry. Stop searching
+         if (IS_NIL(entry->value)) return NULL;
+         // else its a tombstone. Just ignore
+         else {}
+      } else if (entry->key->length == length
+               && entry->key->hash == hash
+               && memcmp(entry->key->chars, chars, length) == 0) {
+         // found it
+         return entry->key;
+      }
+
+      index = (index + 1) % table->capacity;
    }
 }
