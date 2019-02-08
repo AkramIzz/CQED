@@ -139,11 +139,13 @@ static InterpretResult run(VM *vm) {
 
       push(vm, NUMBER_VAL(-AS_NUMBER(pop(vm))));
       break;
-      case OP_RETURN: {
+      case OP_POP: pop(vm); break;
+      case OP_PRINT:
       print_value(pop(vm));
       printf("\n");
+      break;
+      case OP_RETURN:
       return INTERPRET_OK;
-      }
    }
    }
 

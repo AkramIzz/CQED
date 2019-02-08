@@ -36,6 +36,10 @@ typedef struct {
 } ParseRule;
 
 // forward declarations
+static void declaration();
+static void statement();
+static void print_statement();
+static void expression_statement();
 static void expression();
 static void parse_precedence(Precedence precedence);
 static void grouping();
@@ -45,6 +49,8 @@ static void string();
 static void unary();
 static ParseRule* get_rule(TokenType type);
 static void advance();
+static bool check(TokenType type);
+static bool match(TokenType type);
 static void consume(TokenType type, const char *message);
 static void end_compiler();
 static void emit_byte(uint8_t byte);
@@ -81,11 +87,36 @@ bool compile(const char *source, VM *vm, Chunk *chunk) {
    advance();
    
    // parse
-   expression();
-   consume(TOKEN_EOF, "Expected end of expression");
+   while (!match(TOKEN_EOF)) {
+      declaration();
+   }
    
    end_compiler();
    return !parser.had_error;
+}
+
+static void declaration() {
+   statement();
+}
+
+static void statement() {
+   if (match(TOKEN_PRINT)) {
+      print_statement();
+   } else {
+      expression_statement();
+   }
+}
+
+static void print_statement() {
+   expression();
+   consume(TOKEN_SEMICOLON, "Expected ';' after print value");
+   emit_byte(OP_PRINT);
+}
+
+static void expression_statement() {
+   expression();
+   emit_byte(OP_POP);
+   consume(TOKEN_SEMICOLON, "Expected ';' after expression");
 }
 
 static void expression() {
@@ -191,8 +222,20 @@ static void advance() {
    }
 }
 
+static bool check(TokenType type) {
+   return parser.current.type == type;
+}
+
+static bool match(TokenType type) {
+   if (check(type)) {
+      advance();
+      return true;
+   }
+   return false;
+}
+
 static void consume(TokenType type, const char *message) {
-   if (parser.current.type == type) {
+   if (check(type)) {
    advance();
    return;
    }
