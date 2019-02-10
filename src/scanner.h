@@ -1,5 +1,5 @@
-#ifndef QED_SCANNER_H
-#define QED_SCANNER_H
+#ifndef KI_SCANNER_H
+#define KI_SCANNER_H
 
 typedef enum {
    // One character tokens

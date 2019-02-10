@@ -1,5 +1,5 @@
-#ifndef QED_MEMORY_H
-#define QED_MEMORY_H
+#ifndef KI_MEMORY_H
+#define KI_MEMORY_H
 
 #include "object.h"
 

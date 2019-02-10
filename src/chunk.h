@@ -1,5 +1,5 @@
-#ifndef QED_CHUNK_H
-#define QED_CHUNK_H
+#ifndef KI_CHUNK_H
+#define KI_CHUNK_H
 
 #include "common.h"
 #include "value.h"

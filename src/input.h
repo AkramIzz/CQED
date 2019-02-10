@@ -1,5 +1,5 @@
-#ifndef QED_INPUT_H
-#define QED_INPUT_H
+#ifndef KI_INPUT_H
+#define KI_INPUT_H
 
 #ifdef _WIN32
 char* readline(char *prompt);

@@ -1,5 +1,5 @@
-#ifndef QED_TABLE_H
-#define QED_TABLE_H
+#ifndef KI_TABLE_H
+#define KI_TABLE_H
 
 #include "value.h"
 

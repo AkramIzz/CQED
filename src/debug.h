@@ -1,5 +1,5 @@
-#ifndef QED_DEBUG_H
-#define QED_DEBUG_H
+#ifndef KI_DEBUG_H
+#define KI_DEBUG_H
 
 #include "chunk.h"
 

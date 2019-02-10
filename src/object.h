@@ -1,5 +1,5 @@
-#ifndef QED_OBJECT_H
-#define QED_OBJECT_H
+#ifndef KI_OBJECT_H
+#define KI_OBJECT_H
 
 #include "common.h"
 #include "vm.h"

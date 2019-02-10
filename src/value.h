@@ -1,5 +1,5 @@
-#ifndef QED_VALUE_H
-#define QED_VALUE_H
+#ifndef KI_VALUE_H
+#define KI_VALUE_H
 
 #include "common.h"
 

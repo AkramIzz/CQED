@@ -1,5 +1,5 @@
-#ifndef QED_COMMON_H
-#define QED_COMMON_H
+#ifndef KI_COMMON_H
+#define KI_COMMON_H
 
 #include <stdbool.h>
 #include <stddef.h>

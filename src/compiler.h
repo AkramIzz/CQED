@@ -1,5 +1,5 @@
-#ifndef QED_COMPILER_H
-#define QED_COMPILER_H
+#ifndef KI_COMPILER_H
+#define KI_COMPILER_H
 
 #include "common.h"
 #include "vm.h"
